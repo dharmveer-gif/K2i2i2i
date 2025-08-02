@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsHub - Live Current Affairs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        /* Utility Classes */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #dc3545;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #333333 100%);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #dc3545;
+            text-decoration: none;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            color: #ff4757;
+            transform: scale(1.05);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+            margin: 0;
+        }
+
+        .nav-menu li a {
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-menu li a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-menu li a:hover::before {
+            left: 100%;
+        }
+
+        .nav-menu li a:hover {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220,53,69,0.4);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* Breaking News Ticker */
+        .breaking-news {
+            background: #dc3545;
+            color: white;
+            padding: 0.8rem 0;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .breaking-content {
+            display: inline-block;
+            animation: scroll-left 25s linear infinite;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translate3d(100%, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        .breaking-label {
+            background: #000;
+            color: #dc3545;
+            padding: 0.3rem 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Hero Slider */
+        .hero-slider {
+            position: relative;
+            height: 500px;
+            overflow: hidden;
+            margin: 2rem 0;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a1a, #333, #dc3545);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            padding: 2rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide-content {
+            text-align: center;
+            max-width: 800px;
+            animation: slideUp 1s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+            line-height: 1.2;
+        }
+
+        .slide p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+        }
+
+        .slide-meta {
+            background: rgba(220,53,69,0.8);
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+        }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+        }
+
+        .dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #dc3545;
+            transform: scale(1.3);
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 3rem;
+            margin: 3rem 0;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .content-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #dc3545, #a71e2a);
+            color: white;
+            padding: 1.5rem 2rem;
+            font-size: 1.4rem;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -30px;
+            width: 60px;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            transform: skewX(-20deg);
+        }
+
+        .section-content {
+            padding: 2rem;
+        }
+
+        /* Article Cards */
+        .article {
+            border-bottom: 2px solid #f0f0f0;
+            padding: 2rem 0;
+            transition: all 0.4s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .article:last-child {
+            border-bottom: none;
+        }
+
+        .article::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 5px;
+            height: 0;
+            background: #dc3545;
+            transition: height 0.3s ease;
+        }
+
+        .article:hover::before {
+            height: 100%;
+        }
+
+        .article:hover {
+            background: linear-gradient(90deg, #f8f9fa, transparent);
+            margin: 0 -2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            border-radius: 10px;
+            transform: translateX(10px);
+        }
+
+        .article-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            transition: color 0.3s ease;
+        }
+
+        .article:hover .article-title {
+            color: #dc3545;
+        }
+
+        .article-excerpt {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #999;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .category-tag {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .article-time {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .trending-item {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .trending-item:hover {
+            background: linear-gradient(90deg, #f8f9fa, transparent);
+            margin: 0 -2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            border-radius: 10px;
+            transform: translateX(8px);
+        }
+
+        .trending-number {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(220,53,69,0.3);
+            flex-shrink: 0;
+        }
+
+        .trending-content h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .trending-time {
+            font-size: 0.85rem;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* Weather Widget */
+        .weather-widget {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(102,126,234,0.3);
+        }
+
+        .weather-temp {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .weather-desc {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .weather-location {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Ad Blocks */
+        .ad-block {
+            background: linear-gradient(135deg, #f1f1f1, #e9ecef);
+            border: 3px dashed #ccc;
+            padding: 3rem;
+            text-align: center;
+            color: #666;
+            margin: 2.5rem 0;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .ad-block::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(220,53,69,0.1), transparent);
+            animation: shimmer 4s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .ad-block:hover {
+            border-color: #dc3545;
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(220,53,69,0.2);
+        }
+
+        .ad-large {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .ad-small {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Newsletter */
+        .newsletter {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .newsletter h3 {
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+
+        .newsletter p {
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 1rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .newsletter-form button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .newsletter-form button:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220,53,69,0.4);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            color: white;
+            padding: 4rem 0 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            color: #dc3545;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-section p {
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s ease;
+            padding: 0.3rem 0;
+        }
+
+        .footer-section a:hover {
+            color: #dc3545;
+            transform: translateX(5px);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            background: #333;
+            color: white;
+            padding: 1rem;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: #dc3545;
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(220,53,69,0.4);
+        }
+
+        .footer-bottom {
+            border-top: 2px solid #333;
+            padding-top: 2rem;
+            text-align: center;
+            color: #999;
+            font-size: 1rem;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 1.2rem 2rem;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            transform: translateX(400px);
+            transition: transform 0.5s ease;
+            z-index: 1001;
+            font-weight: bold;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            background: #dc3545;
+        }
+
+        .toast.info {
+            background: #17a2b8;
+        }
+
+        /* Refresh Button */
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            width: 60px;
+            height: 60px;
+            box-shadow: 0 8px 25px rgba(220,53,69,0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 12px 35px rgba(220,53,69,0.5);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: #1a1a1a;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .main-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .hero-slider {
+                height: 400px;
+            }
+
+            .slide h2 {
+                font-size: 2rem;
+            }
+
+            .slide p {
+                font-size: 1.1rem;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 0 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-slider {
+                height: 300px;
+            }
+
+            .slide h2 {
+                font-size: 1.6rem;
+            }
+
+            .slide-content {
+                padding: 1rem;
+            }
+
+            .article-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav-container">
+                <a href="#" class="logo">NewsHub</a>
+                <button class="mobile-toggle" onclick="toggleMobile()">☰</button>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#" onclick="showSection('breaking')">Breaking News</a></li>
+                    <li><a href="#" onclick="showSection('politics')">Politics</a></li>
+                    <li><a href="#" onclick="showSection('business')">Business</a></li>
+                    <li><a href="#" onclick="showSection('technology')">Technology</a></li>
+                    <li><a href="#" onclick="showSection('education')">Education</a></li>
+                    <li><a href="#" onclick="showSection('local')">Local Updates</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Breaking News Ticker -->
+    <div class="breaking-news">
+        <div class="container">
+            <span class="breaking-label">BREAKING</span>
+            <span class="breaking-content" id="breakingTicker">
+                Loading latest breaking news updates...
+            </span>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Hero Slider -->
+        <div class="hero-slider" id="heroSlider">
+            <div class="slide active">
+                <div class="slide-content">
+                    <h2>Major Economic Reform Package Approved</h2>
+                    <p>Government announces comprehensive economic reforms aimed at boosting growth and creating employment opportunities across all sectors.</p>
+                    <div class="slide-meta">Breaking News • 2 hours ago</div>
+                </div>
+            </div>
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>Technology Innovation Summit 2025</h2>
+                    <p>Industry leaders gather to discuss cutting-edge AI technologies and digital transformation strategies for the future.</p>
+                    <div class="slide-meta">Technology • 4 hours ago</div>
+                </div>
+            </div>
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>Education Policy Reform Launched</h2>
+                    <p>New educational initiatives focus on digital literacy and skill development to prepare students for the modern economy.</p>
+                    <div class="slide-meta">Education • 6 hours ago</div>
+                </div>
+            </div>
+            <div class="slider-dots">
+                <span class="dot active" onclick="currentSlide(1)"></span>
+                <span class="dot" onclick="currentSlide(2)"></span>
+                <span class="dot" onclick="currentSlide(3)"></span>
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Main Content -->
+            <main id="mainContent">
+                <!-- Breaking News Section -->
+                <section class="content-section" id="breaking">
+                    <div class="section-header">🔥 Breaking News</div>
+                    <div class="section-content" id="breakingContent">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Ad Block -->
+                <div class="ad-block ad-large">
+                    <div>Advertisement Space<br>728x300 Banner Ad<br>Google AdSense Ready</div>
+                </div>
+
+                <!-- Politics Section -->
+                <section class="content-section" id="politics">
+                    <div class="section-header">🏛️ Politics</div>
+                    <div class="section-content" id="politicsContent">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Business Section -->
+                <section class="content-section" id="business">
+                    <div class="section-header">💼 Business</div>
+                    <div class="section-content" id="businessContent">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Technology Section -->
+                <section class="content-section" id="technology">
+                    <div class="section-header">💻 Technology</div>
+                    <div class="section-content" id="technologyContent">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Education Section -->
+                <section class="content-section" id="education">
+                    <div class="section-header">🎓 Education</div>
+                    <div class="section-content" id="educationContent">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Local Updates Section -->
+                <section class="content-section" id="local">
+                    <div class="section-header">📍 Local Updates</div>
+                    <div class="section-content" id="localContent">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Weather Widget -->
+                <div class="weather-widget" id="weatherWidget">
+                    <div class="weather-temp">26°C</div>
+                    <div class="weather-desc">Partly Cloudy</div>
+                    <div class="weather-location">Mumbai, India</div>
+                </div>
+
+                <!-- Trending Stories -->
+                <div class="content-section">
+                    <div class="section-header">🔥 Trending Stories</div>
+                    <div class="section-content" id="trendingContent">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ad Block -->
+                <div class="ad-block ad-small">
+                    <div>Advertisement<br>300x200 Sidebar Ad<br>AdSense Ready</div>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="newsletter">
+                    <h3>📧 Daily Newsletter</h3>
+                    <p>Stay updated with the latest news delivered to your inbox every morning. Join 100K+ subscribers!</p>
+                    <form class="newsletter-form" id="newsletterForm">
+                        <input type="email" placeholder="Enter your email" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+
+                <!-- Another Ad Block -->
+                <div class="ad-block ad-small">
+                    <div>Advertisement<br>300x200 Sidebar Ad<br>AdSense Ready</div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Large Ad Block -->
+        <div class="ad-block ad-large">
+            <div>Advertisement Space<br>970x300 Large Banner Ad<br>Google AdSense Ready</div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>NewsHub</h3>
+                    <p>Your trusted source for breaking news, current affairs, and in-depth analysis. We deliver accurate, timely, and comprehensive coverage of local and national events 24/7.</p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook">📘</a>
+                        <a href="#" title="Twitter">🐦</a>
+                        <a href="#" title="Instagram">📸</a>
+                        <a href="#" title="LinkedIn">💼</a>
+                        <a href="#" title="YouTube">📺</a>
+                        <a href="#" title="Telegram">✈️</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>News Categories</h3>
+                    <a href="#" onclick="showSection('breaking')">Breaking News</a>
+                    <a href="#" onclick="showSection('politics')">Politics</a>
+                    <a href="#" onclick="showSection('business')">Business</a>
+                    <a href="#" onclick="showSection('technology')">Technology</a>
+                    <a href="#" onclick="showSection('education')">Education</a>
+                    <a href="#" onclick="showSection('local')">Local Updates</a>
+                    <a href="#">Sports</a>
+                    <a href="#">Entertainment</a>
+                </div
