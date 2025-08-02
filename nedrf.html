@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SarkariBuzz - Latest Government Job Alerts</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #f59e0b;
+            --text-dark: #1f2937;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--accent-color) !important;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-section {
+            background: white;
+            padding: 40px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .job-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-color: var(--primary-color);
+        }
+
+        .job-title {
+            color: var(--text-dark);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .job-org {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .job-date {
+            color: #dc2626;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            transform: translateY(-1px);
+        }
+
+        .section-title {
+            color: var(--text-dark);
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: var(--accent-color);
+            margin: 10px auto;
+        }
+
+        footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            margin-bottom: 20px;
+        }
+
+        .footer-link {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-color);
+        }
+
+        .social-links a {
+            color: #9ca3af;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .telegram-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0088cc;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .telegram-float:hover {
+            background: #006bb3;
+            transform: scale(1.1);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-section p {
+                font-size: 1rem;
+            }
+            
+            .job-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-briefcase me-2"></i>SarkariBuzz</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-list me-1"></i>Categories</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-id-card me-1"></i>Admit Cards</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-trophy me-1"></i>Results</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-envelope me-1"></i>Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1><i class="fas fa-bell me-2"></i>Latest Government Job Alerts</h1>
+            <p>Your one-stop destination for Sarkari job notifications, admit cards, and results</p>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-lg" placeholder="Search jobs...">
+                        <button class="btn btn-warning btn-lg" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search and Filter Section -->
+    <section class="search-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search by job title, organization...">
+                        <button class="btn btn-primary" type="button">
+                            <i class="fas fa-search me-1"></i>Search
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select">
+                        <option value="">All Categories</option>
+                        <option value="banking">Banking</option>
+                        <option value="railway">Railway</option>
+                        <option value="ssc">SSC</option>
+                        <option value="upsc">UPSC</option>
+                        <option value="state">State Government</option>
+                        <option value="defense">Defense</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Jobs Section -->
+    <section class="container my-5">
+        <h2 class="section-title">Latest Job Alerts</h2>
+        <div class="row">
+            <!-- Job Card 1 -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="job-card">
+                    <h5 class="job-title">Probationary Officer</h5>
+                    <p class="job-org"><i class="fas fa-building me-2"></i>State Bank of India</p>
+                    <p class="job-date"><i class="fas fa-calendar me-2"></i>Last Date: 15th Aug 2025</p>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Card 2 -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="job-card">
+                    <h5 class="job-title">Assistant Loco Pilot</h5>
+                    <p class="job-org"><i class="fas fa-building me-2"></i>Indian Railways</p>
+                    <p class="job-date"><i class="fas fa-calendar me-2"></i>Last Date: 20th Aug 2025</p>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Card 3 -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="job-card">
+                    <h5 class="job-title">Combined Graduate Level</h5>
+                    <p class="job-org"><i class="fas fa-building me-2"></i>Staff Selection Commission</p>
+                    <p class="job-date"><i class="fas fa-calendar me-2"></i>Last Date: 25th Aug 2025</p>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Card 4 -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="job-card">
+                    <h5 class="job-title">Civil Services Examination</h5>
+                    <p class="job-org"><i class="fas fa-building me-2"></i>Union Public Service Commission</p>
+                    <p class="job-date"><i class="fas fa-calendar me-2"></i>Last Date: 30th Aug 2025</p>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Card 5 -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="job-card">
+                    <h5 class="job-title">Constable Recruitment</h5>
+                    <p class="job-org"><i class="fas fa-building me-2"></i>Central Reserve Police Force</p>
+                    <p class="job-date"><i class="fas fa-calendar me-2"></i>Last Date: 5th Sep 2025</p>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Card 6 -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="job-card">
+                    <h5 class="job-title">Junior Engineer</h5>
+                    <p class="job-org"><i class="fas fa-building me-2"></i>Delhi Jal Board</p>
+                    <p class="job-date"><i class="fas fa-calendar me-2"></i>Last Date: 10th Sep 2025</p>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Card 7 -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="job-card">
+                    <h5 class="job-title">Teacher Recruitment</h5>
+                    <p class="job-org"><i class="fas fa-building me-2"></i>Kendriya Vidyalaya Sangathan</p>
+                    <p class="job-date"><i class="fas fa-calendar me-2"></i>Last Date: 15th Sep 2025</p>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Card 8 -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="job-card">
+                    <h5 class="job-title">Sub Inspector</h5>
+                    <p class="job-org"><i class="fas fa-building me-2"></i>Border Security Force</p>
+                    <p class="job-date"><i class="fas fa-calendar me-2"></i>Last Date: 20th Sep 2025</p>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Card 9 -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="job-card">
+                    <h5 class="job-title">Clerk Recruitment</h5>
+                    <p class="job-org"><i class="fas fa-building me-2"></i>Life Insurance Corporation</p>
+                    <p class="job-date"><i class="fas fa-calendar me-2"></i>Last Date: 25th Sep 2025</p>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job Card 10 -->
+            <div class="col-lg-6 col-xl-4">
+                <div class="job-card">
+                    <h5 class="job-title">Medical Officer</h5>
+                    <p class="job-org"><i class="fas fa-building me-2"></i>All India Institute of Medical Sciences</p>
+                    <p class="job-date"><i class="fas fa-calendar me-2"></i>Last Date: 30th Sep 2025</p>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Load More Button -->
+        <div class="text-center mt-4">
+            <button class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-plus me-2"></i>Load More Jobs
+            </button>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <h3 class="mb-3">Never Miss a Job Alert!</h3>
+                    <p class="mb-4">Subscribe to our newsletter and get the latest government job notifications directly in your inbox.</p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="email" class="form-control" placeholder="Enter your email">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-paper-plane me-1"></i>Subscribe
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-briefcase me-2"></i>SarkariBuzz</h5>
+                        <p>Your trusted source for government job alerts, admit cards, and exam results. Stay updated with the latest opportunities in the public sector.</p>
+                    </div>
+                    <div class="col-md-2">
+                        <h6>Quick Links</h6>
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="footer-link">Home</a></li>
+                            <li><a href="#" class="footer-link">Categories</a></li>
+                            <li><a href="#" class="footer-link">Admit Cards</a></li>
+                            <li><a href="#" class="footer-link">Results</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Categories</h6>
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="footer-link">Banking Jobs</a></li>
+                            <li><a href="#" class="footer-link">Railway Jobs</a></li>
+                            <li><a href="#" class="footer-link">SSC Jobs</a></li>
+                            <li><a href="#" class="footer-link">UPSC Jobs</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Follow Us</h6>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-telegram"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-facebook"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Contact</h6>
+                            <p><i class="fas fa-envelope me-2"></i>info@sarkaribuzz.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <div class="text-center">
+                <p>&copy; 2025 SarkariBuzz. All rights reserved. | <a href="#" class="footer-link">Privacy Policy</a> | <a href="#" class="footer-link">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Telegram Button -->
+    <a href="#" class="telegram-float" title="Join our Telegram channel">
+        <i class="fab fa-telegram-plane"></i>
+    </a>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Add loading animation to buttons
+            document.querySelectorAll('.btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (!this.classList.contains('btn-outline-primary')) {
+                        const originalText = this.in
